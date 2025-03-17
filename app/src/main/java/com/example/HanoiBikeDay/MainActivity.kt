@@ -55,7 +55,7 @@ class MainActivity : ComponentActivity() {
 fun WeatherScreen(viewModel: WeatherViewModel = viewModel()) {
     val backgroundGradient = Brush.verticalGradient(
         colors = listOf(
-            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f),
+            MaterialTheme.colorScheme.primaryContainer,
             MaterialTheme.colorScheme.background
         )
     )
@@ -144,13 +144,13 @@ fun WeatherScreen(viewModel: WeatherViewModel = viewModel()) {
 fun WeatherCard(forecast: DailyForecast) {
     val score = forecast.bikeRideScore
     
-    // Define gradient colors based on score
+    // Define gradient colors based on score with improved contrast
     val gradientColors = when (score) {
-        in 0..20 -> listOf(Color(0xFFFF5252).copy(alpha = 0.8f), Color(0xFFFF1744).copy(alpha = 0.9f))
-        in 21..40 -> listOf(Color(0xFFFF9800).copy(alpha = 0.8f), Color(0xFFFF6D00).copy(alpha = 0.9f))
-        in 41..60 -> listOf(Color(0xFFFFEB3B).copy(alpha = 0.8f), Color(0xFFFFD600).copy(alpha = 0.9f))
-        in 61..80 -> listOf(Color(0xFFAED581).copy(alpha = 0.8f), Color(0xFF8BC34A).copy(alpha = 0.9f))
-        else -> listOf(Color(0xFF66BB6A).copy(alpha = 0.8f), Color(0xFF00C853).copy(alpha = 0.9f))
+        in 0..20 -> listOf(Color(0xFFFF5252), Color(0xFFFF1744)) // Deeper red
+        in 21..40 -> listOf(Color(0xFFFF9800), Color(0xFFFF6D00)) // Deeper orange
+        in 41..60 -> listOf(Color(0xFFFFEB3B), Color(0xFFFFD600)) // Deeper yellow
+        in 61..80 -> listOf(Color(0xFF8BC34A), Color(0xFF689F38)) // Deeper light green
+        else -> listOf(Color(0xFF4CAF50), Color(0xFF2E7D32)) // Deeper green
     }
     
     val cardBrush = Brush.linearGradient(gradientColors)
@@ -221,7 +221,7 @@ fun WeatherCard(forecast: DailyForecast) {
                             Text(
                                 text = forecast.weather.firstOrNull()?.description?.capitalize() ?: "",
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = Color.White.copy(alpha = 0.9f),
+                                color = Color.White,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
@@ -268,7 +268,8 @@ fun WeatherInfoItem(title: String, value: String, subtitle: String) {
         Text(
             text = title,
             style = MaterialTheme.typography.bodySmall,
-            color = Color.White.copy(alpha = 0.8f)
+            color = Color.White,
+            fontWeight = FontWeight.Medium
         )
         Text(
             text = value,
@@ -276,11 +277,12 @@ fun WeatherInfoItem(title: String, value: String, subtitle: String) {
             color = Color.White,
             fontWeight = FontWeight.Bold
         )
-    Text(
+        Text(
             text = subtitle,
             style = MaterialTheme.typography.bodySmall,
-            color = Color.White.copy(alpha = 0.7f),
-            fontSize = 10.sp
+            color = Color.White.copy(alpha = 0.9f),
+            fontSize = 10.sp,
+            textAlign = TextAlign.Center
         )
     }
 }
@@ -292,40 +294,45 @@ fun BikeRideScoreIndicator(score: Int) {
         in 21..40 -> Color(0xFFFF6D00)
         in 41..60 -> Color(0xFFFFD600)
         in 61..80 -> Color(0xFF8BC34A)
-        else -> Color(0xFF00C853)
+        else -> Color(0xFF2E7D32)
     }
     
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
-            .size(56.dp)
+            .size(64.dp)
             .clip(CircleShape)
             .background(Color.White.copy(alpha = 0.2f))
-            .border(2.dp, Color.White.copy(alpha = 0.5f), CircleShape)
+            .border(2.dp, Color.White, CircleShape)
             .padding(4.dp)
     ) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-                .size(48.dp)
+                .size(56.dp)
                 .clip(CircleShape)
                 .background(scoreColor)
-                .border(1.dp, Color.White.copy(alpha = 0.7f), CircleShape)
+                .border(1.dp, Color.White, CircleShape)
         ) {
             Column(
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.padding(2.dp)
             ) {
                 Text(
                     text = "$score%",
                     color = Color.White,
                     fontWeight = FontWeight.ExtraBold,
-                    fontSize = 16.sp
+                    fontSize = 18.sp,
+                    textAlign = TextAlign.Center
                 )
+                Spacer(modifier = Modifier.height(1.dp))
                 Text(
-                    text = "BIKE",
+                    text = "FOR BIKING",
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 8.sp
+                    fontSize = 7.sp,
+                    textAlign = TextAlign.Center
                 )
             }
         }
