@@ -42,6 +42,59 @@ class WeatherViewModel : ViewModel() {
         return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 
+    private fun calculateBikeRideScore(forecast: DailyForecast): Int {
+        // Temperature score (0-40 points)
+        // Ideal temperature range: 18-25°C
+        val tempScore = when (forecast.temp.day) {
+            in Double.NEGATIVE_INFINITY..5.0 -> 0 // Too cold
+            in 5.0..10.0 -> 10
+            in 10.0..15.0 -> 20
+            in 15.0..18.0 -> 30
+            in 18.0..25.0 -> 40 // Ideal
+            in 25.0..30.0 -> 30
+            in 30.0..35.0 -> 15
+            else -> 0 // Too hot
+        }
+        
+        // Rain chance score (0-40 points)
+        // Based on weather condition
+        val weatherMain = forecast.weather.firstOrNull()?.main ?: ""
+        val rainScore = when {
+            weatherMain.contains("Rain", ignoreCase = true) -> 0
+            weatherMain.contains("Drizzle", ignoreCase = true) -> 10
+            weatherMain.contains("Thunderstorm", ignoreCase = true) -> 0
+            weatherMain.contains("Snow", ignoreCase = true) -> 5
+            weatherMain.contains("Mist", ignoreCase = true) || 
+            weatherMain.contains("Fog", ignoreCase = true) -> 20
+            weatherMain.contains("Clouds", ignoreCase = true) -> {
+                // Check description for cloud coverage
+                val description = forecast.weather.firstOrNull()?.description ?: ""
+                when {
+                    description.contains("scattered", ignoreCase = true) -> 35
+                    description.contains("few", ignoreCase = true) -> 38
+                    description.contains("broken", ignoreCase = true) -> 30
+                    description.contains("overcast", ignoreCase = true) -> 25
+                    else -> 30
+                }
+            }
+            weatherMain.contains("Clear", ignoreCase = true) -> 40
+            else -> 20 // Default for unknown conditions
+        }
+        
+        // Wind speed score (0-20 points)
+        // Ideal wind speed: 0-10 km/h (0-2.8 m/s)
+        val windScore = when (forecast.wind_speed) {
+            in 0.0..2.8 -> 20 // Ideal (0-10 km/h)
+            in 2.8..5.5 -> 15 // Light breeze (10-20 km/h)
+            in 5.5..8.0 -> 10 // Moderate breeze (20-29 km/h)
+            in 8.0..10.8 -> 5 // Fresh breeze (29-39 km/h)
+            else -> 0 // Strong wind, not good for biking
+        }
+        
+        // Calculate total score (0-100)
+        return tempScore + rainScore + windScore
+    }
+
     private fun fetchWeather() {
         viewModelScope.launch {
             isLoading = true
@@ -79,6 +132,10 @@ class WeatherViewModel : ViewModel() {
                         )
                     }
                     .take(7) // Take only 7 days
+                    .map { forecast ->
+                        // Calculate bike ride score for each forecast
+                        forecast.copy(bikeRideScore = calculateBikeRideScore(forecast))
+                    }
                 
                 weatherState = dailyForecasts
                 error = null

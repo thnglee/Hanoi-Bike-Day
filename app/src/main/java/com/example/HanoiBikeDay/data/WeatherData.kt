@@ -45,7 +45,8 @@ data class DailyForecast(
     val temp: Temperature,
     val humidity: Int,
     val wind_speed: Double,
-    val weather: List<Weather>
+    val weather: List<Weather>,
+    val bikeRideScore: Int = 0 // Add bike ride score with default value
 )
 
 data class Temperature(
