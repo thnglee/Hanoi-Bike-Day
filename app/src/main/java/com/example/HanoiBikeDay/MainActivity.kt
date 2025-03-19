@@ -15,6 +15,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.HanoiBikeDay.data.DailyForecast
+import com.example.HanoiBikeDay.data.HourlyForecast
 import com.example.HanoiBikeDay.ui.theme.HanoiBikeDayTheme
 import com.example.HanoiBikeDay.viewmodel.WeatherViewModel
 import java.text.SimpleDateFormat
@@ -37,6 +38,8 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -121,7 +124,37 @@ fun WeatherScreen(viewModel: WeatherViewModel = viewModel()) {
                             style = MaterialTheme.typography.headlineSmall,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onBackground,
-                            modifier = Modifier.padding(vertical = 16.dp)
+                            modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
+                        )
+                        
+                        // Hourly Forecast Section
+                        Text(
+                            text = "Next 24 Hours",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                        
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .horizontalScroll(rememberScrollState())
+                                .padding(bottom = 16.dp)
+                        ) {
+                            viewModel.hourlyWeatherState.forEach { hourlyForecast ->
+                                HourlyForecastCard(hourlyForecast = hourlyForecast)
+                                Spacer(modifier = Modifier.width(12.dp))
+                            }
+                        }
+                        
+                        // Daily Forecast Section
+                        Text(
+                            text = "6-Day Forecast",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            modifier = Modifier.padding(bottom = 8.dp)
                         )
                         
                         LazyColumn(
@@ -277,7 +310,7 @@ fun WeatherInfoItem(title: String, value: String, subtitle: String) {
             color = Color.White,
             fontWeight = FontWeight.Bold
         )
-        Text(
+    Text(
             text = subtitle,
             style = MaterialTheme.typography.bodySmall,
             color = Color.White.copy(alpha = 0.9f),
@@ -339,8 +372,98 @@ fun BikeRideScoreIndicator(score: Int) {
     }
 }
 
+@Composable
+fun HourlyForecastCard(hourlyForecast: HourlyForecast) {
+    val score = hourlyForecast.bikeRideScore
+    val scoreColor = when (score) {
+        in 0..20 -> Color(0xFFFF1744)
+        in 21..40 -> Color(0xFFFF6D00)
+        in 41..60 -> Color(0xFFFFD600)
+        in 61..80 -> Color(0xFF8BC34A)
+        else -> Color(0xFF2E7D32)
+    }
+    
+    val weatherIcon = when (hourlyForecast.weather.firstOrNull()?.main?.lowercase()) {
+        "clear" -> R.drawable.ic_clear
+        "clouds" -> R.drawable.ic_clouds
+        "rain" -> R.drawable.ic_rain
+        "snow" -> R.drawable.ic_snow
+        "thunderstorm" -> R.drawable.ic_thunderstorm
+        "drizzle" -> R.drawable.ic_drizzle
+        "mist" -> R.drawable.ic_mist
+        else -> R.drawable.ic_unknown
+    }
+    
+    Card(
+        modifier = Modifier
+            .width(100.dp)
+            .height(160.dp)
+            .shadow(
+                elevation = 2.dp,
+                shape = RoundedCornerShape(12.dp)
+            ),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceEvenly
+        ) {
+            // Time
+            Text(
+                text = formatHourTime(hourlyForecast.dt),
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Bold
+            )
+            
+            // Weather Icon - Changed from Icon to Image for PNG files
+            Image(
+                painter = painterResource(id = weatherIcon),
+                contentDescription = hourlyForecast.weather.firstOrNull()?.description,
+                modifier = Modifier.size(40.dp),
+                contentScale = ContentScale.Fit
+            )
+            
+            // Weather Description
+            Text(
+                text = hourlyForecast.weather.firstOrNull()?.main ?: "",
+                style = MaterialTheme.typography.bodySmall,
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            
+            // Bike Score
+            Box(
+                modifier = Modifier
+                    .size(36.dp)
+                    .clip(CircleShape)
+                    .background(scoreColor),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "$score%",
+                    color = Color.White,
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+    }
+}
+
 private fun formatDate(timestamp: Long): String {
     val sdf = SimpleDateFormat("EEE, MMM dd", Locale.getDefault())
+    return sdf.format(Date(timestamp * 1000))
+}
+
+private fun formatHourTime(timestamp: Long): String {
+    val sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
     return sdf.format(Date(timestamp * 1000))
 }
 

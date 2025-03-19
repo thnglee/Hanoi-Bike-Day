@@ -53,4 +53,14 @@ data class Temperature(
     val day: Double,
     val min: Double,
     val max: Double
+)
+
+// Add this to your existing data classes
+data class HourlyForecast(
+    val dt: Long,
+    val temp: Double,
+    val humidity: Int,
+    val wind_speed: Double,
+    val weather: List<Weather>,
+    val bikeRideScore: Int = 0
 ) 
