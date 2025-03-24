@@ -1,6 +1,8 @@
 # Hanoi Bike Day
 
-A modern Android application that helps cyclists in Hanoi plan their rides based on weather conditions and air quality. The app provides a comprehensive view of daily weather forecasts along with biking suitability scores and air quality information.
+A simple Android application that helps cyclists in Hanoi plan their rides based on weather conditions and air quality. 
+The app provides a comprehensive view of daily weather forecasts along with biking suitability scores and air quality information.
+Weather API: OpenWeatherMap
 
 ## Features
 
@@ -12,7 +14,7 @@ A modern Android application that helps cyclists in Hanoi plan their rides based
 
 ## Screenshots
 
-[Add screenshots here]
+![img.png](img.png)
 
 ## Technical Stack
 
@@ -53,35 +55,3 @@ The app displays real-time air quality information with a gradient indicator sho
 - Unhealthy (Red)
 - Very Unhealthy (Purple)
 
-## Getting Started
-
-### Prerequisites
-- Android Studio Arctic Fox or newer
-- Android SDK 21 or higher
-- Kotlin 1.9.0 or higher
-
-### Installation
-1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/hanoi-bike-day.git
-```
-
-2. Open the project in Android Studio
-
-3. Sync project with Gradle files
-
-4. Run the app on an emulator or physical device
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Acknowledgments
-
-- Weather data provided by [Add your weather data provider]
-- Air quality data provided by [Add your AQI data provider]
-- Icons and design inspiration [Add credits if applicable] 
