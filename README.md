@@ -14,7 +14,10 @@ Weather API: OpenWeatherMap
 
 ## Screenshots
 
-![img.png](img.png)
+<p align="center">
+  <img src="img.png" alt="Mobile Screenshot" width="300"/>
+</p>
+
 
 ## Technical Stack
 
